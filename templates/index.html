@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Dashboard</title>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+  <!-- Add any additional styles or scripts if needed -->
+</head>
+
+<body class="container-fluid mx-4 my-4" data-bs-theme="light">
+  <div class="row mb-3 rounded vh-100">
+    <!-- Sidebar -->
+    <nav id="sidebar" class="col-md-2 bg-primary rounded-3">
+      <div class="navbar rounded">
+        <a class="navbar-brand text-light" href="#">
+          SWIC Forecast Dashboard
+        </a>
+      </div>
+      
+      <!-- Sidebar Content -->
+      <ul class="nav flex-column mt-3">
+        <li class="nav-item">
+          <a class="nav-link text-light" href="/dashboard">Forecasting</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-light" href="/database">Database</a>
+        </li>
+        <!-- Add more links as needed -->
+      </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <div id="content" class="col-md-10">
+      <div class="row mb-3">
+        <div class="col-md-4">
+          <form id="forecastForm" action="/dashboard" method="get">
+            <div class="input-group mt-3">
+              <input type="text" class="form-control" name="interval" id="intervalInput" placeholder="Interval" required>
+              <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div class="row mb-3">
+        <div class="col-md-5">
+          <div class="card mt-3">
+            <h5 class="card-header">Total Forecasted Revenue</h5>
+            <div class="card-body">
+              {{sum_forecast_revenue}}
+            </div>
+          </div>
+        </div>
+
+        <!-- <div class="col-md-5">
+          <div class="card mt-3">
+            <h5 class="card-header">Total Forecasted Revenue</h5>
+            <div class="card-body">
+              {{sum_forecast_revenue}}
+            </div>
+          </div>
+        </div> -->
+      </div>
+
+      <div class="row mb-3">
+        <div class="col-md-10">
+          <div class="card">
+            <h5 class="card-header">Forecasted Revenue</h5>
+            <div class="card-body">
+              <div id="line_graph" class="responsive-plot"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      var graph_json = {{ graph_json | safe }};
+      var config = { responsive: true };
+
+      Plotly.newPlot('line_graph', graph_json.data, graph_json.layout, config);
+
+      var d3 = Plotly.d3;
+      var WIDTH_IN_PERCENT_OF_PARENT = 100,
+        HEIGHT_IN_PERCENT_OF_PARENT = 100;
+
+      var gd3 = d3.selectAll(".responsive-plot")
+        .style({
+          width: 'fit-content',
+          'margin-left': (100 - WIDTH_IN_PERCENT_OF_PARENT) / 2 + '%',
+          height: 'fit-content',
+          'margin-top': '0vh'
+        });
+
+      var nodes_to_resize = gd3[0];
+      window.onresize = function () {
+        for (var i = 0; nodes_to_resize && i < nodes_to_resize.length; i++) {
+          Plotly.Plots.resize(nodes_to_resize[i]);
+        }
+      };
+    });
+  </script>
+
+  <!-- <script>
+    function submitForm() {
+      // Get the value from the input field
+      var intervalValue = document.getElementById('intervalInput').value;
+
+      // Set the value to the form's action attribute
+      document.getElementById('forecastForm').action = "/dashboard?interval=" + intervalValue;
+
+      // Submit the form
+      document.getElementById('forecastForm').submit();
+    }
+  </script> -->
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+    crossorigin="anonymous"></script>
+</body>
+
+</html>

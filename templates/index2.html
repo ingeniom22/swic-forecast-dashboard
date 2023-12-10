@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Dashboard</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <!-- Add any additional styles or scripts if needed -->
+</head>
+
+<body class="container-fluid mx-4 my-4" data-bs-theme="light">
+    <div class="row mb-3 rounded vh-100">
+        <!-- Sidebar -->
+        <nav id="sidebar" class="col-md-2 bg-primary rounded-3">
+            <div class="navbar rounded">
+                <a class="navbar-brand text-light" href="#">
+                    SWIC Forecast Dashboard
+                </a>
+            </div>
+
+            <!-- Sidebar Content -->
+            <ul class="nav flex-column mt-3">
+                <li class="nav-item">
+                    <a class="nav-link text-light" href="/dashboard">Forecasting</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-light" href="/">Database</a>
+                </li>
+                <!-- Add more links as needed -->
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <div id="content" class="col-md-10">
+            <div class="row mb-3">
+                <div class="col-md-1">
+                    <button type="button" class="btn btn-primary btn-large my-2 float-end" data-bs-toggle="modal"
+                        data-bs-target="#addModal">
+                        Add Revenue
+                    </button>
+                </div>
+            </div>
+
+
+
+            <div class="row mb-3">
+                <div class="col-md-10">
+                    <div class="card">
+                        <h5 class="card-header">Revenue Database</h5>
+                        <div class="card-body">
+
+                            <div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel"
+                                aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="addModalLabel">Add Revenue</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
+                                        </div>
+
+                                        <div class="modal-body">
+                                            <form id="addForm">
+                                                <div class="mb-3">
+                                                    <label for="date" class="form-label">Date</label>
+                                                    <input type="text" placeholder="yyyy-mm-dd" class="form-control"
+                                                        id="date" name="date" required>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="revenue" class="form-label">Revenue</label>
+                                                    <input type="number" class="form-control" id="revenue"
+                                                        name="revenue" required>
+                                                </div>
+
+                                                <button type="button" class="btn btn-primary" onclick="addRevenue()">Add
+                                                    Revenue</button>
+
+                                                <script>
+                                                    function addRevenue() {
+                                                        var form = document.getElementById("addForm");
+                                                        var formData = new FormData(form);
+
+                                                        fetch("/post/revenue", {
+                                                            method: "POST",
+                                                            body: formData.json()
+                                                        })
+                                                            .then(response => response.json())
+                                                            .then(data => {
+                                                                console.log("Success:", data);
+                                                                // Reset the form or perform other actions upon success
+                                                                form.reset();
+                                                            })
+                                                            .catch(error => {
+                                                                console.error("Error:", error);
+                                                            });
+                                                    }
+
+                                                    // Prevent the default form submission behavior
+                                                    var addForm = document.getElementById("addForm");
+                                                    addForm.addEventListener("submit", function (event) {
+                                                        event.preventDefault();
+                                                    });
+                                                </script>
+                                            </form>
+
+
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary"
+                                                data-bs-dismiss="modal">Close</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <table class="table table-striped mt-3">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Date</th>
+                                        <th>Revenue</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for revenue in revenues %}
+                                    <tr>
+                                        <td>{{ revenue.id }}</td>
+                                        <td>{{ revenue.date }}</td>
+                                        <td>{{ revenue.revenue }}</td>
+                                        <td> <button type="button" class="btn btn-warning" data-bs-toggle="modal"
+                                                data-bs-target="#editModal-{{revenue.id}}" tabindex="-1">
+                                                Edit
+                                            </button>
+                                            <button type="button" class="btn btn-danger" data-bs-toggle="modal"
+                                                data-bs-target="#deleteModal-{{revenue.id}}" tabindex="-1">
+                                                Delete
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+        crossorigin="anonymous"> </script>
+
+</body>
+
+</html>
